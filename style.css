@@ -1,0 +1,46 @@
+
+
+body {
+    background-color: #f8f9fa;
+  }
+
+  #loginPage,
+  #mainPage {
+    max-width: 600px;
+    margin: 50px auto;
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  #loginPage h2,
+  #mainPage .navbar-brand {
+    color: #007bff;
+  }
+
+  #loginPage button[type="submit"] {
+    background-color: #007bff;
+    border-color: #007bff;
+  }
+
+  #loginPage button[type="submit"]:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+  }
+
+  #content .list-group-item.completed {
+    text-decoration: line-through;
+  }
+
+  #content .list-group-item {
+    cursor: pointer;
+  }
+
+  #content .list-group-item:hover {
+    background-color: #f1f1f1;
+  }
+
+  #content .list-group-item input[type="checkbox"] {
+    margin-right: 10px;
+  }
