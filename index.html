@@ -6,12 +6,7 @@
   <title>Todo App</title>
   <!-- Bootstrap CSS -->
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-
   <link href="style.css" rel="stylesheet">
-
-  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-
-
 </head>
 <body>
   <!-- Login Page -->
@@ -54,31 +49,9 @@
   <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-
-  
-
   <script>
-    var completedCount = 0; // Counter for completed tasks
-
-  // Function to fetch todo list data
-  function fetchTodoList() {
-    return new Promise(function(resolve, reject) {
-      $.ajax({
-        url: "https://jsonplaceholder.typicode.com/todos",
-        method: "GET",
-        success: function(data) {
-          resolve(data);
-        },
-        error: function(xhr, status, error) {
-          reject(error);
-        }
-      });
-    });
-  }
-
-      
     $(document).ready(function() {
-      var prevCompletedCount = 0; // Counter for previously completed tasks
+      var completedCount = 0; // Counter for completed tasks
 
       // Check if the user is already logged in
       var loggedIn = sessionStorage.getItem("loggedIn");
@@ -111,9 +84,6 @@
       $("#todoListLink").click(function(event) {
         event.preventDefault();
         fetchTodoList().then(function(todoList) {
-          // Reset completed count and display the todo list
-          completedCount = 0;
-          prevCompletedCount = 0;
           displayTodoList(todoList);
         }).catch(function(error) {
           console.error('Error fetching todo list:', error);
@@ -121,69 +91,64 @@
         });
       });
 
-      // Fetch todo list data and initialize completedCount
-      fetchTodoList().then(function(todoList) {
-        // Count the number of completed tasks
-        completedCount = todoList.filter(function(todo) {
-          return todo.completed;
-        }).length;
-
-        // Display the todo list
-        displayTodoList(todoList);
-      }).catch(function(error) {
-        console.error('Error fetching todo list:', error);
-        alert("An error occurred while fetching the todo list. Please try again later.");
-      });
       // Function to show main page
       function showMainPage() {
         $("#loginPage").hide();
         $("#mainPage").show();
       }
 
-      
-  // Function to handle checkbox change event
-  $("#content").on("change", "input[type='checkbox']", function() {
-    var $tr = $(this).closest("tr");
-    var status = this.checked ? "Completed" : "";
-    var wasCompleted = $tr.hasClass("completed"); // Check if task was previously completed
-    $tr.find(".status").text(status);
-    if (status === "Completed" && !wasCompleted) { // Increment count only if task was not previously completed
-      completedCount++;
-    } else if (status !== "Completed" && wasCompleted) { // Decrement count if task was previously completed and now unchecked
-      completedCount--;
-    }
-
-    // Check if exactly 5 tasks have been completed
-    if (completedCount === 5) {
-      alert("Congrats! You have completed 5 tasks successfully.");
-    }
-  });
+      // Function to fetch todo list data
+      function fetchTodoList() {
+        return new Promise(function(resolve, reject) {
+          $.ajax({
+            url: "https://jsonplaceholder.typicode.com/todos",
+            method: "GET",
+            success: function(data) {
+              resolve(data);
+            },
+            error: function(xhr, status, error) {
+              reject(error);
+            }
+          });
+        });
+      }
 
       // Function to display todo list
       function displayTodoList(todoList) {
-    var $content = $("#content");
-    $content.empty();
-    var $table = $("<table>").addClass("table");
-    var $thead = $("<thead>").append("<tr><th>Task</th><th>Status</th><th>Completed</th></tr>");
-    var $tbody = $("<tbody>");
-    todoList.forEach(function(todo) {
-      var $tr = $("<tr>");
-      var $checkbox = $("<input>").attr("type", "checkbox").addClass("mr-2");
-      var $status = $("<span>").addClass("status").text(todo.completed ? "Completed" : "");
-      if (todo.completed) {
-        $checkbox.prop("checked", true).prop("disabled", true);
+        var $content = $("#content");
+        $content.empty();
+        var $table = $("<table>").addClass("table");
+        var $thead = $("<thead>").append("<tr><th>Task</th><th>Status</th><th>Completed</th></tr>");
+        var $tbody = $("<tbody>");
+        todoList.forEach(function(todo) {
+          var $tr = $("<tr>");
+          var $checkbox = $("<input>").attr("type", "checkbox").addClass("mr-2");
+          var $status = $("<span>").addClass("status").text(todo.completed ? "Completed" : "");
+          if (todo.completed) {
+            $checkbox.prop("checked", true).prop("disabled", true);
+          } else {
+            $checkbox.on("change", function() {
+              if (this.checked) {
+                completedCount++;
+                if (completedCount === 5) {
+                  alert("Congrats! You have completed 5 tasks successfully.");
+                  // Disable remaining checkboxes
+                  $tbody.find("input[type='checkbox']:not(:checked)").prop("disabled", true);
+                }
+              } else {
+                completedCount--;
+              }
+              $status.text(this.checked ? "Completed" : "");
+              $(this).prop("disabled", true); // Disable the checkbox after it's checked
+            });
+          }
+          $tr.append($("<td>").text(todo.title), $("<td>").append($status), $("<td>").append($checkbox));
+          $tbody.append($tr);
+        });
+        $table.append($thead, $tbody);
+        $content.append($table);
       }
-      $tr.append($("<td>").text(todo.title), $("<td>").append($status), $("<td>").append($checkbox));
-      $tbody.append($tr);
     });
-    $table.append($thead, $tbody);
-    $content.append($table);
-  }
-});
-  
   </script>
-
-
-  
 </body>
 </html>
